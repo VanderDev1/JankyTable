@@ -22,6 +22,8 @@ class TableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //TODO: Rework bundle stuff...
+        
         guard let plist = Bundle.main.url(forResource: "PhotosDictionary", withExtension: "plist"),
             let contents = try? Data(contentsOf: plist),
             let serial = try? PropertyListSerialization.propertyList(from: contents, format: nil),
@@ -44,8 +46,6 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView?, numberOfRowsInSection section: Int) -> Int {
         
         return photosDict.count
-//         return self.urls.count
-//        return photos.count
     }
     
 //     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
