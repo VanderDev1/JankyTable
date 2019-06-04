@@ -84,15 +84,29 @@ class TableViewController: UITableViewController {
 //    }
     
     
+   
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellIdentifier", for: indexPath)
-        let rowKey = photos.allKeys[indexPath.row] as! String
+        let rowKey = self.photos.allKeys[indexPath.row] as! String
+        
+        //TODO: Send filtering to BG queue, then set image on main queue...
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            
+            guard let self = self else {
+                return
+            }
+            
+        
+//        let queue = DispatchQueue(label: "com.makeschool.queue")
+        
         
         var image : UIImage?
         
-        guard let imageURL = URL(string:photos[rowKey] as! String),
-            let imageData = try? Data(contentsOf: imageURL) else {
-                return cell
+        guard let imageURL = URL(string:self.photos[rowKey] as! String),
+        let imageData = try? Data(contentsOf: imageURL) else {
+//            return cell
+            return
         }
         
         // Simulate a network wait
@@ -104,14 +118,48 @@ class TableViewController: UITableViewController {
         //2
         image = self.applySepiaFilter(unfilteredImage!)
         
-        // Configure the cell...
-        cell.textLabel?.text = rowKey
-        if image != nil {
-            cell.imageView?.image = image!
+        DispatchQueue.main.async {
+            // Configure the cell...
+            cell.textLabel?.text = rowKey
+            if image != nil {
+                cell.imageView?.image = image!
+            }
         }
         
+//        return cell
+    }
         return cell
     }
+    
+    /* Working cellForRowAt - no Concurrency */
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "CellIdentifier", for: indexPath)
+//        let rowKey = photos.allKeys[indexPath.row] as! String
+//
+//        var image : UIImage?
+//
+//        guard let imageURL = URL(string:photos[rowKey] as! String),
+//            let imageData = try? Data(contentsOf: imageURL) else {
+//                return cell
+//        }
+//
+//        // Simulate a network wait
+//        Thread.sleep(forTimeInterval: 1)
+//        print("sleeping 1 sec")
+//
+//        //1
+//        let unfilteredImage = UIImage(data:imageData)
+//        //2
+//        image = self.applySepiaFilter(unfilteredImage!)
+//
+//        // Configure the cell...
+//        cell.textLabel?.text = rowKey
+//        if image != nil {
+//            cell.imageView?.image = image!
+//        }
+//
+//        return cell
+//    }
     
     
 //    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
